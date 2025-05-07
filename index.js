@@ -59,7 +59,7 @@ app.get('/', (req, res) => {
         <body>
             <div class="container">
                 <h1>Bem-vindo ao Backend Completo</h1>
-                <p>Para utilização do backend, acesse o repositório no GitHub:</p>
+                <p>Para utilização do backend, acesse o repositório no Swagger:</p>
                 <p><a href="https://rodescobar.github.io/backendCompleto/api/swagger-ui/" target="_blank">https://rodescobar.github.io/backendCompleto/api/swagger-ui/</a></p>
             </div>
         </body>
