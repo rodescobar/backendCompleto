@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Backend Aula</title>
+            <title>Backend Completo</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -58,9 +58,9 @@ app.get('/', (req, res) => {
         </head>
         <body>
             <div class="container">
-                <h1>Bem-vindo ao Backend Aula</h1>
+                <h1>Bem-vindo ao Backend Completo</h1>
                 <p>Para utilização do backend, acesse o repositório no GitHub:</p>
-                <p><a href="https://github.com/rodescobar/backendAula" target="_blank">https://github.com/rodescobar/backendAula</a></p>
+                <p><a href="https://rodescobar.github.io/backendCompleto/api/swagger-ui/" target="_blank">https://rodescobar.github.io/backendCompleto/api/swagger-ui/</a></p>
             </div>
         </body>
         </html>
