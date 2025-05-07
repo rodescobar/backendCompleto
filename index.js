@@ -8,8 +8,15 @@ const yaml = require("yamljs");
 app.use(cors())
 app.use(express.json())
 
+/*
 const swaggerDocument = yaml.load("./swagger-ui/swagger.yaml");
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+const path = require('path');
+const swaggerDocument = yaml.load(path.join(__dirname, 'swagger-ui', 'swagger.yaml'));
+*/
+const path = require('path');
+const swaggerDocument = yaml.load(path.join(__dirname, 'api', 'swagger-ui', 'swagger.yaml'));
 
 require("./models/database");
 
