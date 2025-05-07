@@ -1,0 +1,607 @@
+openapi: 3.0.0
+info:
+  title: Backend Aula API
+  version: 1.0.0
+  description: API para utilização em aula de TASI
+servers:
+  - url: https://backend-aula.vercel.app
+paths:
+  /app/registrar:
+    post:
+      summary: Registrar usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario:
+                  type: string
+                  description: Usuário RA do aluno
+                senha:
+                  type: string
+                  description: Senha (não será criptografada)
+                confirma:
+                  type: string
+                  description: Confirmação da senha
+              required:
+                - usuario
+                - senha
+                - confirma
+      responses:
+        '200':
+          description: Usuário registrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usuario:
+                    type: string
+                  senha:
+                    type: string
+                  id:
+                    type: string
+        '400':
+          description: Erro ao registrar usuário
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /app/login:
+    post:
+      summary: Login do usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuario:
+                  type: string
+                  description: Usuário RA do aluno
+                senha:
+                  type: string
+                  description: Senha (não será criptografada)
+              required:
+                - usuario
+                - senha
+      responses:
+        '200':
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Erro ao fazer login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /app/produtos:
+    get:
+      summary: Listar Produtos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    usuario:
+                      type: string
+                    nome:
+                      type: string
+                    quantidade:
+                      type: integer
+                    preco:
+                      type: number
+                    categoria:
+                      type: string
+                      description: Categoria do produto
+                    descricao:
+                      type: string
+                    imagem:
+                      type: string
+                    __v:
+                      type: integer
+    post:
+      summary: Novo Produto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                quantidade:
+                  type: integer
+                preco:
+                  type: number
+                categoria:
+                  type: string
+                  description: Categoria do produto (opcional)
+                descricao:
+                  type: string
+                usuario:
+                  type: string
+                imagem:
+                  type: string
+              required:
+                - nome
+                - quantidade
+                - preco
+                - descricao
+                - usuario
+                - imagem
+      responses:
+        '200':
+          description: Produto criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  usuario:
+                    type: string
+                  nome:
+                    type: string
+                  quantidade:
+                    type: integer
+                  preco:
+                    type: number
+                  categoria:
+                    type: string
+                  descricao:
+                    type: string
+                  imagem:
+                    type: string
+                  __v:
+                    type: integer
+        '400':
+          description: Erro ao criar produto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    put:
+      summary: Atualizar Produto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                nome:
+                  type: string
+                quantidade:
+                  type: integer
+                preco:
+                  type: number
+                categoria:
+                  type: string
+                  description: Categoria do produto (opcional)
+                descricao:
+                  type: string
+                imagem:
+                  type: string
+              required:
+                - id
+                - nome
+                - quantidade
+                - preco
+                - descricao
+                - imagem
+      responses:
+        '200':
+          description: Produto atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  nome:
+                    type: string
+                  quantidade:
+                    type: integer
+                  preco:
+                    type: number
+                  categoria:
+                    type: string
+                  descricao:
+                    type: string
+                  imagem:
+                    type: string
+        '400':
+          description: Erro ao atualizar produto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      summary: Excluir Produto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+      responses:
+        '200':
+          description: Produto excluído com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Erro ao excluir produto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /app/produtos/{nome_do_produto}:
+    get:
+      summary: Listar Produtos por Nome
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: nome_do_produto
+          schema:
+            type: string
+          required: true
+          description: Nome do produto
+      responses:
+        '200':
+          description: Lista de produtos por nome
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    usuario:
+                      type: string
+                    nome:
+                      type: string
+                    quantidade:
+                      type: integer
+                    preco:
+                      type: number
+                    descricao:
+                      type: string
+                    imagem:
+                      type: string
+                    __v:
+                      type: integer
+        '400':
+          description: Erro ao listar produtos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /app/categorias:
+    get:
+      summary: Listar Categorias
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: nome_categoria
+          schema:
+            type: string
+          description: Nome da categoria para filtro (opcional)
+      responses:
+        '200':
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    usuario:
+                      type: string
+                    nome:
+                      type: string
+    post:
+      summary: Criar Nova Categoria
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome_categoria:
+                  type: string
+                  description: Nome da categoria
+              required:
+                - nome_categoria
+      responses:
+        '200':
+          description: Categoria criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  usuario:
+                    type: string
+                  nome:
+                    type: string
+    put:
+      summary: Atualizar Categoria
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                nome_categoria:
+                  type: string
+              required:
+                - id
+                - nome_categoria
+      responses:
+        '200':
+          description: Categoria atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  nome:
+                    type: string
+    delete:
+      summary: Excluir Categoria
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+      responses:
+        '200':
+          description: Categoria excluída com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /app/venda:
+    get:
+      summary: Listar Vendas
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: ID da venda para filtro (opcional)
+      responses:
+        '200':
+          description: Lista de vendas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    usuario:
+                      type: string
+                    nomeCliente:
+                      type: string
+                    data:
+                      type: string
+                      format: date
+                    produtos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          nome:
+                            type: string
+                          quantidade:
+                            type: integer
+                          preco:
+                            type: number
+    post:
+      summary: Criar Nova Venda
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nomeCliente:
+                  type: string
+                data:
+                  type: string
+                  format: date
+                produtos:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      nome:
+                        type: string
+                      quantidade:
+                        type: integer
+                      preco:
+                        type: number
+              required:
+                - nomeCliente
+                - data
+                - produtos
+      responses:
+        '200':
+          description: Venda criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  nomeCliente:
+                    type: string
+                  data:
+                    type: string
+                    format: date
+                  produtos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nome:
+                          type: string
+                        quantidade:
+                          type: integer
+                        preco:
+                          type: number
+    delete:
+      summary: Excluir Venda
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID da venda a ser excluída
+      responses:
+        '200':
+          description: Venda excluída com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /app/limpar:
+    get:
+      summary: Limpar Tabelas do Usuário
+      description: Remove todos os dados das tabelas categorias, produtos, usuário e venda para o usuário autenticado.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tabelas limpas com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensagem:
+                    type: string
+                    example: "Tabelas limpas com sucesso para o usuário."
+        '400':
+          description: Erro de autenticação
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  erro:
+                    type: string
+                    example: "Usuário não autenticado."
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  erro:
+                    type: string
+                    example: "Erro ao limpar tabelas."
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
