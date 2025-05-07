@@ -17,6 +17,7 @@ const swaggerDocument = yaml.load(path.join(__dirname, 'swagger-ui', 'swagger.ya
 */
 const path = require('path');
 const swaggerDocument = yaml.load(path.join(__dirname, 'api', 'swagger-ui', 'swagger.yaml'));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 require("./models/database");
 

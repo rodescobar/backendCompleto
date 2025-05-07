@@ -2,9 +2,10 @@
 
 ## REST API
 
-URL ```https://backend-aula.vercel.app/```
+URL ```https://backend-completo.vercel.app/```
 
-[SWAGGER](https://rodescobar.github.io/backendAula/swagger-ui/) ```https://rodescobar.github.io/backendAula/swagger-ui/```
+[SWAGGER](https://github.com/rodescobar/backendCompleto/api-docs) 
+
 
 ### OAuth
 - Adição da tag Authorization no header da chamada
