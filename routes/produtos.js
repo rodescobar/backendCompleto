@@ -34,6 +34,8 @@ route.post("/produtos", async (req, res) => {
         if (imagem == "" || imagem == undefined)
             return res.send({ erro: "Imagem não pode ser nula." })
 
+        if (categoria == "" || categoria == undefined)
+            return res.send({ erro: "categoria não pode ser nula." })        
 
         var ret = await Produtos.Novo(nome, quantidade, preco, descricao, usuario, imagem, categoria)
         return res.send(ret)
@@ -67,6 +69,9 @@ route.put("/produtos", async (req, res) => {
         if (imagem == "" || imagem == undefined)
             return res.send({ erro: "Imagem não pode ser nula." })
 
+        if (categoria == "" || categoria == undefined)
+            return res.send({ erro: "categoria não pode ser nula." })  
+                
         var ret = await Produtos.Alterar(id, nome, quantidade, preco, descricao, imagem, categoria)
         return res.send(ret)
     }

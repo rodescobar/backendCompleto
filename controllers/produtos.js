@@ -12,9 +12,9 @@ module.exports = {
         }
     },
 
-    Novo: async (nome, quantidade, preco, descricao, usuario, imagem) => {
+    Novo: async (nome, quantidade, preco, descricao, usuario, imagem, categoria) => {
         try {
-            return await Produtos.create({ nome, quantidade, preco, descricao, usuario, imagem })
+            return await Produtos.create({ nome, quantidade, preco, descricao, usuario, imagem, categoria })
         }
         catch(e) {
             console.log(e)
@@ -22,9 +22,9 @@ module.exports = {
         }
     },
 
-    Alterar: async (id, nome, quantidade, preco, descricao, imagem) => {
+    Alterar: async (nome, quantidade, preco, descricao, usuario, imagem, categoria) => {
         try {
-            return await Produtos.findByIdAndUpdate(id, { nome, quantidade, preco, descricao, imagem }, { new: true})
+            return await Produtos.findByIdAndUpdate(id, { nome, quantidade, preco, descricao, usuario, imagem, categoria }, { new: true})
         }
         catch (e) {
             console.log(e)
