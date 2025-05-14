@@ -50,6 +50,7 @@ route.post("/produtos", async (req, res) => {
 
 route.put("/produtos", async (req, res) => {
     const { id, nome, quantidade, preco, descricao, imagem, categoria } = req.body
+    const usuario = req.usuarioId
     try {
         if (id == "" || id == undefined)
             return res.send({ erro: "Id não pode ser nulo." })
@@ -72,7 +73,7 @@ route.put("/produtos", async (req, res) => {
         if (categoria == "" || categoria == undefined)
             return res.send({ erro: "categoria não pode ser nula." })  
                 
-        var ret = await Produtos.Alterar(id, nome, quantidade, preco, descricao, imagem, categoria)
+        var ret = await Produtos.Alterar(id, nome, quantidade, preco, descricao, usuario, categoria, imagem)
         return res.send(ret)
     }
     catch (e) {

@@ -22,9 +22,9 @@ module.exports = {
         }
     },
 
-    Alterar: async (nome, quantidade, preco, descricao, usuario, imagem, categoria) => {
+    Alterar: async (id, nome, quantidade, preco, descricao, usuario, categoria, imagem) => {
         try {
-            return await Produtos.findByIdAndUpdate({_id: id}, { nome, quantidade, preco, descricao, usuario, imagem, categoria }, { new: true})
+            return await Produtos.findByIdAndUpdate(id, { nome, quantidade, preco, descricao, usuario, categoria, imagem }, { new: true})
         }
         catch (e) {
             console.log(e)
