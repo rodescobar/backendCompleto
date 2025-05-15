@@ -5,7 +5,7 @@ const route = express.Router()
 const Produtos = require("../controllers/produtos")
 const Venda = require("../controllers/venda")
 
-route.get("/produtos/:nome_produto?", async (req, res) => {
+route.get("/produtos/:usuario?/:nome_produto?", async (req, res) => {
     const usuario = req.params.usuario
     const nome_produto = req.params.nome_produto || req.query.nome_produto || ""
 
