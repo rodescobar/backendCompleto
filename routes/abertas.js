@@ -6,9 +6,11 @@ const Produtos = require("../controllers/produtos")
 const Venda = require("../controllers/venda")
 
 route.get("/produtos/:nome_produto?", async (req, res) => {
-    const usuario = req.usuarioId
+    const usuario = req.params.usuario
     const nome_produto = req.params.nome_produto || req.query.nome_produto || ""
 
+    if (usuario == undefined)
+        return res.send({ error: "Você precisa informar o usuário" })
     var retorno = await Produtos.Listar(usuario, nome_produto)
 
     return res.send(retorno)
