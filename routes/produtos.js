@@ -5,15 +5,6 @@ const route = express.Router()
 const Produtos = require("../controllers/produtos")
 
 
-route.get("/produtos/:nome_produto?", async (req, res) => {
-    const usuario = req.usuarioId
-    const nome_produto = req.params.nome_produto || req.query.nome_produto || ""
-
-    var retorno = await Produtos.Listar(usuario, nome_produto)
-
-    return res.send(retorno)
-})
-
 route.post("/produtos", async (req, res) => {
     try{
         const { nome, quantidade, preco, descricao, imagem, categoria } = req.body

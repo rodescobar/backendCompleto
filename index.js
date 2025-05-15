@@ -67,6 +67,7 @@ app.get('/', (req, res) => {
     `);
 })
 
+require("./routes/abertas")(app)
 require("./routes/usuario")(app)
 
 //MiddleWare

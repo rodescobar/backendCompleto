@@ -13,21 +13,6 @@ route.get("/venda/:id?", async (req, res) => {
     return res.send(retorno)
 })
 
-route.post("/venda", async (req, res) => {
-    const usuario = req.usuarioId
-    const { nomeCliente, data, produtos } = req.body
-
-    if (nomeCliente == "" || nomeCliente == undefined)
-        return res.send({ erro: "Nome do cliente não pode ser nulo." })
-
-    if (produtos == "" || produtos == undefined)
-        return res.send({ erro: "Produtos não pode ser nulo." })
-
-    var retorno = await Venda.Novo(usuario, nomeCliente, data, produtos)
-
-    return res.send(retorno)
-})
-
 route.delete("/venda", async (req, res) => {
     const { id } = req.body
     const usuario = req.usuarioId
