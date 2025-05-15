@@ -290,7 +290,7 @@ paths:
                 properties:
                   error:
                     type: string
-  /app/produtos/{nome_do_produto}:
+  /app/produtos/{usuario}/{nome_do_produto}::
     get:
       summary: Listar Produtos por Nome
       security:
