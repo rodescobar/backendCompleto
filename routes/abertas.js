@@ -3,7 +3,7 @@ const express = require("express")
 const route = express.Router()
 
 const Produtos = require("../controllers/produtos")
-const Venda = require("../controllers/vendas")
+const Venda = require("../controllers/venda")
 
 route.get("/produtos/:nome_produto?", async (req, res) => {
     const usuario = req.usuarioId
