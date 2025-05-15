@@ -90,7 +90,7 @@ paths:
                 properties:
                   error:
                     type: string
-  /app/produtos/<USUARIO>/<NOME>::
+  /app/produtos:
     get:
       summary: Listar Produtos
       security:
@@ -290,17 +290,23 @@ paths:
                 properties:
                   error:
                     type: string
-  /app/produtos/{usuario}/{nome_do_produto}::
+  /app/produtos/{usuario}/{nome_do_produto}:
     get:
       summary: Listar Produtos por Nome
       security:
         - bearerAuth: []
       parameters:
         - in: path
-          name: nome_do_produto
+          name: usaurio
           schema:
             type: string
           required: true
+          description: Usuario
+        - in: path
+          name: nome_do_produto
+          schema:
+            type: string
+          required: false
           description: Nome do produto
       responses:
         '200':
