@@ -154,7 +154,7 @@ paths:
                       type: string
                     __v:
                       type: integer
-  /app/produtos/:
+  /app/produtos:
     post:
       tags:
         - Área administrativa Produtos
