@@ -2,12 +2,28 @@ openapi: 3.0.0
 info:
   title: Backend Aula API
   version: 1.0.0
-  description: API para utilização em aula de TASI
+  description: |
+    Aqui você encontra a documentação dos endpoints. Para serem utilizados em seu desenvolvimento frontend
+
+    URL: https://backend-completo.vercel.app
+
+    Qualquer dúvida, consulte o professor.
 servers:
   - url: https://backend-completo.vercel.app
+tags:
+  - name: Abertos
+    description: Endpoints para acesso sem login
+  - name: Área administrativa Categorias
+    description: Endpoints para acesso através de Token
+  - name: Área administrativa Produtos
+    description: Endpoints para acesso através de Token
+  - name: Área administrativa Vendas
+    description: Endpoints para acesso através de Token    
 paths:
   /app/registrar:
     post:
+      tags:
+        - Abertos
       summary: Registrar usuário
       requestBody:
         required: true
@@ -54,6 +70,8 @@ paths:
                     type: string
   /app/login:
     post:
+      tags:
+        - Abertos
       summary: Login do usuário
       requestBody:
         required: true
@@ -90,11 +108,23 @@ paths:
                 properties:
                   error:
                     type: string
-  /app/produtos:
+  /app/produtos/{usuario}/{nome_produto}:
     get:
+      tags:
+        - Abertos
       summary: Listar Produtos
-      security:
-        - bearerAuth: []
+      parameters:
+        - in: path
+          name: usuario
+          schema:
+            type: string
+          required: true
+          description: Usuario responsável pelo trabalho (usuario criado para o login na área administrativa)
+        - in: path
+          name: nome_produto
+          schema:
+            type: string
+          description: Nome do produto
       responses:
         '200':
           description: Lista de produtos
@@ -124,7 +154,10 @@ paths:
                       type: string
                     __v:
                       type: integer
+  /app/produtos/:
     post:
+      tags:
+        - Área administrativa Produtos
       summary: Novo Produto
       security:
         - bearerAuth: []
@@ -146,8 +179,6 @@ paths:
                   description: Categoria do produto (opcional)
                 descricao:
                   type: string
-                usuario:
-                  type: string
                 imagem:
                   type: string
               required:
@@ -155,7 +186,6 @@ paths:
                 - quantidade
                 - preco
                 - descricao
-                - usuario
                 - imagem
       responses:
         '200':
@@ -166,8 +196,6 @@ paths:
                 type: object
                 properties:
                   _id:
-                    type: string
-                  usuario:
                     type: string
                   nome:
                     type: string
@@ -193,6 +221,8 @@ paths:
                   error:
                     type: string
     put:
+      tags:
+        - Área administrativa Produtos
       summary: Atualizar Produto
       security:
         - bearerAuth: []
@@ -257,6 +287,8 @@ paths:
                   error:
                     type: string
     delete:
+      tags:
+        - Área administrativa Produtos
       summary: Excluir Produto
       security:
         - bearerAuth: []
@@ -290,55 +322,10 @@ paths:
                 properties:
                   error:
                     type: string
-  /app/produtos/{nome_do_produto}:
-    get:
-      summary: Listar Produtos por Nome
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: nome_do_produto
-          schema:
-            type: string
-          required: true
-          description: Nome do produto
-      responses:
-        '200':
-          description: Lista de produtos por nome
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                    usuario:
-                      type: string
-                    nome:
-                      type: string
-                    quantidade:
-                      type: integer
-                    preco:
-                      type: number
-                    descricao:
-                      type: string
-                    imagem:
-                      type: string
-                    __v:
-                      type: integer
-        '400':
-          description: Erro ao listar produtos
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
   /app/categorias:
     get:
+      tags:
+        - Área administrativa Categorias
       summary: Listar Categorias
       security:
         - bearerAuth: []
@@ -365,6 +352,8 @@ paths:
                     nome:
                       type: string
     post:
+      tags:
+        - Área administrativa Categorias
       summary: Criar Nova Categoria
       security:
         - bearerAuth: []
@@ -395,6 +384,8 @@ paths:
                   nome:
                     type: string
     put:
+      tags:
+        - Área administrativa Categorias
       summary: Atualizar Categoria
       security:
         - bearerAuth: []
@@ -425,6 +416,8 @@ paths:
                   nome:
                     type: string
     delete:
+      tags:
+        - Área administrativa Categorias
       summary: Excluir Categoria
       security:
         - bearerAuth: []
@@ -449,46 +442,10 @@ paths:
                 properties:
                   message:
                     type: string
-  /app/venda:
-    get:
-      summary: Listar Vendas
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
-          description: ID da venda para filtro (opcional)
-      responses:
-        '200':
-          description: Lista de vendas
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                    usuario:
-                      type: string
-                    nomeCliente:
-                      type: string
-                    data:
-                      type: string
-                      format: date
-                    produtos:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          nome:
-                            type: string
-                          quantidade:
-                            type: integer
-                          preco:
-                            type: number
+  /app/venda/{usuario}:
     post:
+      tags:
+        - Abertos
       summary: Criar Nova Venda
       requestBody:
         required: true
@@ -543,7 +500,52 @@ paths:
                           type: integer
                         preco:
                           type: number
+  /app/venda:    
+    get:
+      tags:
+        - Área administrativa Vendas
+      summary: Listar Vendas
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: ID da venda para filtro (opcional)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Listar de vendas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    usuario:
+                      type: string
+                    nomeCliente:
+                      type: string
+                    data:
+                      type: string
+                      format: date
+                    produtos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          nome:
+                            type: string
+                          quantidade:
+                            type: integer
+                          preco:
+                            type: number
     delete:
+      tags:
+        - Área administrativa Vendas
       summary: Excluir Venda
       parameters:
         - in: path
@@ -552,6 +554,8 @@ paths:
             type: string
           required: true
           description: ID da venda a ser excluída
+      security: 
+        - bearerAuth: []
       responses:
         '200':
           description: Venda excluída com sucesso
@@ -564,8 +568,8 @@ paths:
                     type: string
   /app/limpar:
     get:
-      summary: Limpar Tabelas do Usuário
-      description: Remove todos os dados das tabelas categorias, produtos, usuário e venda para o usuário autenticado.
+      summary: Limpar todas as TABELAS do usuário de login
+      description: Remove todos os dados das tabelas categorias, produtos, usuário e venda para o usuário autenticado. Isso para inicar um novo teste
       security:
         - bearerAuth: []
       responses:

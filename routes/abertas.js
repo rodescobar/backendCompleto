@@ -5,9 +5,12 @@ const route = express.Router()
 const Produtos = require("../controllers/produtos")
 const Venda = require("../controllers/venda")
 
-route.get("/produtos/:nome_produto?", async (req, res) => {
-    const usuario = req.usuarioId
+route.get("/produtos/:usuario?/:nome_produto?", async (req, res) => {
+    const usuario = req.params.usuario || req.query.usuario || ""
     const nome_produto = req.params.nome_produto || req.query.nome_produto || ""
+
+    if (usuario == "" || usuario == undefined)
+        return res.send({ erro: "Usuário não pode ser nulo." })
 
     var retorno = await Produtos.Listar(usuario, nome_produto)
 
@@ -15,9 +18,11 @@ route.get("/produtos/:nome_produto?", async (req, res) => {
 })
 
 route.post("/venda", async (req, res) => {
-    const usuario = req.usuarioId
-    const { nomeCliente, data, produtos } = req.body
+    const { nomeCliente, data, produtos, usuario } = req.body
 
+    if (usuario == "" || usuario == undefined)
+        return res.send({ erro: "Usuário não pode ser nulo." })
+        
     if (nomeCliente == "" || nomeCliente == undefined)
         return res.send({ erro: "Nome do cliente não pode ser nulo." })
 
