@@ -442,7 +442,7 @@ paths:
                 properties:
                   message:
                     type: string
-  /app/venda/{usuario}:
+  /app/venda:
     post:
       tags:
         - Abertos
@@ -455,6 +455,8 @@ paths:
               type: object
               properties:
                 nomeCliente:
+                  type: string
+                usuario:
                   type: string
                 data:
                   type: string
@@ -474,6 +476,7 @@ paths:
                 - nomeCliente
                 - data
                 - produtos
+                - usuario
       responses:
         '200':
           description: Venda criada com sucesso
