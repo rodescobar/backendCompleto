@@ -503,7 +503,6 @@ paths:
                           type: integer
                         preco:
                           type: number
-  /app/venda:    
     get:
       tags:
         - Área administrativa Vendas
