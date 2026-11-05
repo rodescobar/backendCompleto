@@ -1,5 +1,6 @@
 const test = require("node:test")
 const assert = require("node:assert/strict")
+const mongoose = require("mongoose")
 
 const app = require("../index")
 
@@ -14,6 +15,7 @@ test.before(async () => {
 
 test.after(async () => {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
+    await mongoose.disconnect()
 })
 
 test("a documentação Swagger está disponível", async () => {

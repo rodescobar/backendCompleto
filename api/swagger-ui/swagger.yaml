@@ -7,10 +7,10 @@ info:
     produtos e vendas de uma loja virtual.
 
 servers:
-  - url: http://localhost:3000
-    description: Ambiente local
   - url: https://backend-completo.vercel.app
     description: Ambiente de produção
+  - url: http://localhost:3000
+    description: Ambiente local (abra o Swagger localmente)
 
 tags:
   - name: Usuários

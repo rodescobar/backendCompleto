@@ -5,7 +5,15 @@ const cors = require("cors")
 const swaggerUi = require("swagger-ui-express");
 const yaml = require("yamljs");
 
-app.use(cors())
+const corsOptions = {
+    origin: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204
+}
+
+app.use(cors(corsOptions))
+app.options("*", cors(corsOptions))
 app.use(express.json())
 
 const path = require('path');
