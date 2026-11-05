@@ -18,13 +18,17 @@ module.exports = {
         }
         catch(e) {
             console.log(e)
-            return e
+            return { erro: "Erro ao criar categoria." }
         }
     },
 
-    Alterar: async (id, nome) => {
+    Alterar: async (id, nome, usuario) => {
         try {
-            return await Categorias.findByIdAndUpdate(id, { nome }, { new: true})
+            return await Categorias.findOneAndUpdate(
+                { _id: id, usuario },
+                { nome },
+                { new: true, runValidators: true }
+            )
         }
         catch (e) {
             console.log(e)

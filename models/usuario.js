@@ -5,7 +5,9 @@ const { Schema } = mongoose;
 const Usuario = new Schema({
     usuario: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        trim: true
     },
     senha: {
         type: String,

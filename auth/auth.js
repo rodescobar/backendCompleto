@@ -1,23 +1,39 @@
 const jwt = require("jsonwebtoken")
-require("dotenv/config")
+const { jwtSecret, legacyJwtSecret } = require("../config/auth")
 
-module.exports = async (req, res, next) => {
-    const token = (req.headers.authorization)?(req.headers.authorization):("")
-    
-    if (token == undefined)
-        return res.send({ error: "Token não foi encontrado"})
+const erroAutenticacao = (res, mensagem) => {
+    // `erro` mantém compatibilidade com os consumidores antigos da API.
+    return res.status(401).send({ error: mensagem, erro: mensagem })
+}
 
-    const valor = token.split(" ")
-    const [ baerer, valToken ] = valor
+module.exports = (req, res, next) => {
+    const header = req.headers.authorization || ""
+    const [scheme, value, ...rest] = header.trim().split(/\s+/)
 
-    if (!/^Bearer$/i.test(baerer))
-        return res.send({ error: "Token mal formatdo"})
-        
-    await jwt.verify( valToken, "PalmeirasoPrimeiroC4mpe4a0Mund1al", (erro, data) =>{
-        if (erro)
-            return res.send({ error: "Token inválido ou já expirou"})
-        req.usuarioId =  data.usuario
-    })
+    if (!header)
+        return erroAutenticacao(res, "Token não foi encontrado")
 
+    if (!/^Bearer$/i.test(scheme) || !value || rest.length > 0)
+        return erroAutenticacao(res, "Token mal formatado")
+
+    let data
+    try {
+        data = jwt.verify(value, jwtSecret)
+    } catch (erro) {
+        // Permite a migração dos tokens antigos quando JWT_SECRET foi trocada.
+        if (jwtSecret === legacyJwtSecret)
+            return erroAutenticacao(res, "Token inválido ou já expirou")
+
+        try {
+            data = jwt.verify(value, legacyJwtSecret)
+        } catch (legacyErro) {
+            return erroAutenticacao(res, "Token inválido ou já expirou")
+        }
+    }
+
+    if (!data || !data.usuario)
+        return erroAutenticacao(res, "Token inválido ou já expirou")
+
+    req.usuarioId = data.usuario
     return next()
 }

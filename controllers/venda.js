@@ -14,7 +14,7 @@ module.exports = {
         }
         catch(e) {
             console.log(e)
-            return e
+            return { erro: "Erro ao criar venda." }
         }
     },
     Excluir: async (id, usuario) => {

@@ -7,7 +7,7 @@ const Produtos = require("../models/produtos");
 const Usuario = require("../models/usuario");
 const Venda = require("../models/venda");
 
-route.get("/limpar", async (req, res) => {
+const limpar = async (req, res) => {
     try {
         const usuario = req.usuarioId;
 
@@ -26,7 +26,12 @@ route.get("/limpar", async (req, res) => {
         console.log(e);
         return res.status(500).send({ erro: "Erro ao limpar tabelas." });
     }
-});
+};
+
+// GET é mantido por compatibilidade com os testes antigos. A forma correta
+// para uma operação destrutiva é DELETE.
+route.get("/limpar", limpar);
+route.delete("/limpar", limpar);
 
 module.exports = app => app.use("/app", route);
 

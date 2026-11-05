@@ -1,130 +1,97 @@
 openapi: 3.0.0
 info:
-  title: Backend Aula API
-  version: 1.0.0
+  title: API de Administração de Loja Virtual
+  version: 1.1.0
   description: |
-    Aqui você encontra a documentação dos endpoints. Para serem utilizados em seu desenvolvimento frontend
+    API REST para autenticação de usuários e administração de categorias,
+    produtos e vendas de uma loja virtual.
 
-    URL: https://backend-completo.vercel.app
-
-    Qualquer dúvida, consulte o professor.
 servers:
+  - url: http://localhost:3000
+    description: Ambiente local
   - url: https://backend-completo.vercel.app
+    description: Ambiente de produção
+
 tags:
-  - name: Abertos
-    description: Endpoints para acesso sem login
-  - name: Área administrativa Categorias
-    description: Endpoints para acesso através de Token
-  - name: Área administrativa Produtos
-    description: Endpoints para acesso através de Token
-  - name: Área administrativa Vendas
-    description: Endpoints para acesso através de Token    
+  - name: Usuários
+  - name: Catálogo público
+  - name: Categorias
+  - name: Produtos
+  - name: Vendas
+  - name: Ambiente de testes
+
 paths:
   /app/registrar:
     post:
-      tags:
-        - Abertos
-      summary: Registrar usuário
+      tags: [Usuários]
+      summary: Registra um usuário administrador
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                usuario:
-                  type: string
-                  description: Usuário RA do aluno
-                senha:
-                  type: string
-                  description: Senha (não será criptografada)
-                confirma:
-                  type: string
-                  description: Confirmação da senha
-              required:
-                - usuario
-                - senha
-                - confirma
+              $ref: '#/components/schemas/Registro'
       responses:
-        '200':
-          description: Usuário registrado com sucesso
+        '201':
+          description: Usuário registrado
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  usuario:
-                    type: string
-                  senha:
-                    type: string
-                  id:
-                    type: string
+                $ref: '#/components/schemas/Usuario'
         '400':
-          description: Erro ao registrar usuário
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+          $ref: '#/components/responses/ErroRequisicao'
+
   /app/login:
     post:
-      tags:
-        - Abertos
-      summary: Login do usuário
+      tags: [Usuários]
+      summary: Autentica um usuário
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                usuario:
-                  type: string
-                  description: Usuário RA do aluno
-                senha:
-                  type: string
-                  description: Senha (não será criptografada)
-              required:
-                - usuario
-                - senha
+              $ref: '#/components/schemas/Login'
       responses:
         '200':
-          description: Login bem-sucedido
+          description: Login realizado
           content:
             application/json:
               schema:
                 type: object
+                required: [token]
                 properties:
                   token:
                     type: string
+                    description: Token JWT válido por 24 horas
         '400':
-          description: Erro ao fazer login
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+
+  /app/perfil:
+    get:
+      tags: [Usuários]
+      summary: Consulta o perfil do usuário autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil do usuário
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-  /app/produtos/{usuario}/{nome_produto}:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+        '404':
+          description: Usuário não encontrado
+
+  /app/produtos/{usuario}:
     get:
-      tags:
-        - Abertos
-      summary: Listar Produtos
+      tags: [Catálogo público]
+      summary: Lista produtos públicos de um usuário
       parameters:
-        - in: path
-          name: usuario
-          schema:
-            type: string
-          required: true
-          description: Usuario responsável pelo trabalho (usuario criado para o login na área administrativa)
-        - in: path
-          name: nome_produto
-          schema:
-            type: string
-          description: Nome do produto
+        - $ref: '#/components/parameters/Usuario'
       responses:
         '200':
           description: Lista de produtos
@@ -133,32 +100,35 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                    usuario:
-                      type: string
-                    nome:
-                      type: string
-                    quantidade:
-                      type: integer
-                    preco:
-                      type: number
-                    categoria:
-                      type: string
-                      description: Categoria do produto
-                    descricao:
-                      type: string
-                    imagem:
-                      type: string
-                    __v:
-                      type: integer
+                  $ref: '#/components/schemas/Produto'
+        '400':
+          $ref: '#/components/responses/ErroRequisicao'
+
+  /app/produtos/{usuario}/{nome_produto}:
+    get:
+      tags: [Catálogo público]
+      summary: Busca produtos públicos pelo nome
+      parameters:
+        - $ref: '#/components/parameters/Usuario'
+        - in: path
+          name: nome_produto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Produtos encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Produto'
+
   /app/produtos:
     post:
-      tags:
-        - Área administrativa Produtos
-      summary: Novo Produto
+      tags: [Produtos]
+      summary: Cria um produto
       security:
         - bearerAuth: []
       requestBody:
@@ -166,64 +136,21 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nome:
-                  type: string
-                quantidade:
-                  type: integer
-                preco:
-                  type: number
-                categoria:
-                  type: string
-                  description: Categoria do produto (opcional)
-                descricao:
-                  type: string
-                imagem:
-                  type: string
-              required:
-                - nome
-                - quantidade
-                - preco
-                - descricao
-                - imagem
+              $ref: '#/components/schemas/ProdutoEntrada'
       responses:
-        '200':
-          description: Produto criado com sucesso
+        '201':
+          description: Produto criado
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                  nome:
-                    type: string
-                  quantidade:
-                    type: integer
-                  preco:
-                    type: number
-                  categoria:
-                    type: string
-                  descricao:
-                    type: string
-                  imagem:
-                    type: string
-                  __v:
-                    type: integer
+                $ref: '#/components/schemas/Produto'
         '400':
-          description: Erro ao criar produto
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
     put:
-      tags:
-        - Área administrativa Produtos
-      summary: Atualizar Produto
+      tags: [Produtos]
+      summary: Atualiza um produto do usuário autenticado
       security:
         - bearerAuth: []
       requestBody:
@@ -231,65 +158,29 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                nome:
-                  type: string
-                quantidade:
-                  type: integer
-                preco:
-                  type: number
-                categoria:
-                  type: string
-                  description: Categoria do produto (opcional)
-                descricao:
-                  type: string
-                imagem:
-                  type: string
-              required:
-                - id
-                - nome
-                - quantidade
-                - preco
-                - descricao
-                - imagem
+              allOf:
+                - $ref: '#/components/schemas/ProdutoEntrada'
+                - type: object
+                  required: [id]
+                  properties:
+                    id:
+                      type: string
       responses:
         '200':
-          description: Produto atualizado com sucesso
+          description: Produto atualizado
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                  nome:
-                    type: string
-                  quantidade:
-                    type: integer
-                  preco:
-                    type: number
-                  categoria:
-                    type: string
-                  descricao:
-                    type: string
-                  imagem:
-                    type: string
+                $ref: '#/components/schemas/Produto'
         '400':
-          description: Erro ao atualizar produto
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+        '404':
+          description: Produto não encontrado
     delete:
-      tags:
-        - Área administrativa Produtos
-      summary: Excluir Produto
+      tags: [Produtos]
+      summary: Exclui um produto do usuário autenticado
       security:
         - bearerAuth: []
       requestBody:
@@ -298,35 +189,24 @@ paths:
           application/json:
             schema:
               type: object
+              required: [id]
               properties:
                 id:
                   type: string
-              required:
-                - id
       responses:
         '200':
-          description: Produto excluído com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+          description: Produto excluído
         '400':
-          description: Erro ao excluir produto
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+        '404':
+          description: Produto não encontrado
+
   /app/categorias:
     get:
-      tags:
-        - Área administrativa Categorias
-      summary: Listar Categorias
+      tags: [Categorias]
+      summary: Lista categorias do usuário autenticado
       security:
         - bearerAuth: []
       parameters:
@@ -334,7 +214,7 @@ paths:
           name: nome_categoria
           schema:
             type: string
-          description: Nome da categoria para filtro (opcional)
+          description: Filtro opcional por nome
       responses:
         '200':
           description: Lista de categorias
@@ -343,18 +223,12 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                    usuario:
-                      type: string
-                    nome:
-                      type: string
+                  $ref: '#/components/schemas/Categoria'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
     post:
-      tags:
-        - Área administrativa Categorias
-      summary: Criar Nova Categoria
+      tags: [Categorias]
+      summary: Cria uma categoria
       security:
         - bearerAuth: []
       requestBody:
@@ -363,30 +237,24 @@ paths:
           application/json:
             schema:
               type: object
+              required: [nome_categoria]
               properties:
                 nome_categoria:
                   type: string
-                  description: Nome da categoria
-              required:
-                - nome_categoria
       responses:
         '200':
-          description: Categoria criada com sucesso
+          description: Categoria criada
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                  usuario:
-                    type: string
-                  nome:
-                    type: string
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
     put:
-      tags:
-        - Área administrativa Categorias
-      summary: Atualizar Categoria
+      tags: [Categorias]
+      summary: Atualiza uma categoria do usuário autenticado
       security:
         - bearerAuth: []
       requestBody:
@@ -395,30 +263,24 @@ paths:
           application/json:
             schema:
               type: object
+              required: [id, nome_categoria]
               properties:
                 id:
                   type: string
                 nome_categoria:
                   type: string
-              required:
-                - id
-                - nome_categoria
       responses:
         '200':
-          description: Categoria atualizada com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                  nome:
-                    type: string
+          description: Categoria atualizada
+        '400':
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+        '404':
+          description: Categoria não encontrada
     delete:
-      tags:
-        - Área administrativa Categorias
-      summary: Excluir Categoria
+      tags: [Categorias]
+      summary: Exclui uma categoria
       security:
         - bearerAuth: []
       requestBody:
@@ -427,185 +289,262 @@ paths:
           application/json:
             schema:
               type: object
+              required: [id]
               properties:
                 id:
                   type: string
-              required:
-                - id
       responses:
         '200':
-          description: Categoria excluída com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+          description: Categoria excluída
+        '400':
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+
   /app/venda:
     post:
-      tags:
-        - Abertos
-      summary: Criar Nova Venda
+      tags: [Vendas]
+      summary: Registra uma venda para uma loja
+      description: Rota pública utilizada pelo catálogo. O campo usuario identifica a loja.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                nomeCliente:
-                  type: string
-                usuario:
-                  type: string
-                data:
-                  type: string
-                  format: date
-                produtos:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      nome:
-                        type: string
-                      quantidade:
-                        type: integer
-                      preco:
-                        type: number
-              required:
-                - nomeCliente
-                - data
-                - produtos
-                - usuario
+              $ref: '#/components/schemas/VendaEntrada'
       responses:
-        '200':
-          description: Venda criada com sucesso
+        '201':
+          description: Venda criada
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                  nomeCliente:
-                    type: string
-                  data:
-                    type: string
-                    format: date
-                  produtos:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        nome:
-                          type: string
-                        quantidade:
-                          type: integer
-                        preco:
-                          type: number
+                $ref: '#/components/schemas/Venda'
+        '400':
+          $ref: '#/components/responses/ErroRequisicao'
     get:
-      tags:
-        - Área administrativa Vendas
-      summary: Listar Vendas
+      tags: [Vendas]
+      summary: Lista vendas do usuário autenticado
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: id
           schema:
             type: string
-          description: ID da venda para filtro (opcional)
-      security:
-        - bearerAuth: []
+          description: ID opcional de uma venda
       responses:
         '200':
-          description: Listar de vendas
+          description: Lista de vendas
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                    usuario:
-                      type: string
-                    nomeCliente:
-                      type: string
-                    data:
-                      type: string
-                      format: date
-                    produtos:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          nome:
-                            type: string
-                          quantidade:
-                            type: integer
-                          preco:
-                            type: number
+                  $ref: '#/components/schemas/Venda'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
     delete:
-      tags:
-        - Área administrativa Vendas
-      summary: Excluir Venda
+      tags: [Vendas]
+      summary: Exclui uma venda usando o ID no corpo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id:
+                  type: string
+      responses:
+        '200':
+          description: Venda excluída
+        '400':
+          $ref: '#/components/responses/ErroRequisicao'
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+        '404':
+          description: Venda não encontrada
+
+  /app/venda/{id}:
+    delete:
+      tags: [Vendas]
+      summary: Exclui uma venda usando o ID na URL
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
+          required: true
           schema:
             type: string
-          required: true
-          description: ID da venda a ser excluída
-      security: 
-        - bearerAuth: []
       responses:
         '200':
-          description: Venda excluída com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+          description: Venda excluída
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+        '404':
+          description: Venda não encontrada
+
   /app/limpar:
-    get:
-      summary: Limpar todas as TABELAS do usuário de login
-      description: Remove todos os dados das tabelas categorias, produtos, usuário e venda para o usuário autenticado. Isso para inicar um novo teste
+    delete:
+      tags: [Ambiente de testes]
+      summary: Remove todos os dados do usuário autenticado
+      description: Operação destrutiva destinada somente a testes controlados.
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Tabelas limpas com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  mensagem:
-                    type: string
-                    example: "Tabelas limpas com sucesso para o usuário."
-        '400':
-          description: Erro de autenticação
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  erro:
-                    type: string
-                    example: "Usuário não autenticado."
-        '500':
-          description: Erro interno do servidor
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  erro:
-                    type: string
-                    example: "Erro ao limpar tabelas."
+          description: Dados removidos
+        '401':
+          $ref: '#/components/responses/ErroAutenticacao'
+    get:
+      tags: [Ambiente de testes]
+      summary: Compatibilidade da operação de limpeza antiga
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dados removidos
+
 components:
+  parameters:
+    Usuario:
+      in: path
+      name: usuario
+      required: true
+      schema:
+        type: string
+      description: Nome do usuário proprietário da loja
+  responses:
+    ErroRequisicao:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    ErroAutenticacao:
+      description: Token ausente, inválido ou expirado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+  schemas:
+    Erro:
+      type: object
+      properties:
+        erro:
+          type: string
+        error:
+          type: string
+    Usuario:
+      type: object
+      properties:
+        _id:
+          type: string
+        usuario:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    Registro:
+      type: object
+      required: [usuario, senha, confirma]
+      properties:
+        usuario:
+          type: string
+          example: aluno01
+        senha:
+          type: string
+          format: password
+          example: senha123
+        confirma:
+          type: string
+          format: password
+          example: senha123
+    Login:
+      type: object
+      required: [usuario, senha]
+      properties:
+        usuario:
+          type: string
+        senha:
+          type: string
+          format: password
+    Categoria:
+      type: object
+      properties:
+        _id:
+          type: string
+        usuario:
+          type: string
+        nome:
+          type: string
+    ProdutoEntrada:
+      type: object
+      required: [nome, quantidade, preco, descricao, imagem, categoria]
+      properties:
+        nome:
+          type: string
+        quantidade:
+          type: number
+          minimum: 0
+        preco:
+          type: number
+          minimum: 0
+        descricao:
+          type: string
+        imagem:
+          type: string
+          format: uri
+        categoria:
+          type: string
+    Produto:
+      allOf:
+        - $ref: '#/components/schemas/ProdutoEntrada'
+        - type: object
+          properties:
+            _id:
+              type: string
+            usuario:
+              type: string
+    VendaEntrada:
+      type: object
+      required: [nomeCliente, data, produtos, usuario]
+      properties:
+        nomeCliente:
+          type: string
+        data:
+          type: string
+          format: date-time
+        usuario:
+          type: string
+        produtos:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ItemVenda'
+    Venda:
+      allOf:
+        - $ref: '#/components/schemas/VendaEntrada'
+        - type: object
+          properties:
+            _id:
+              type: string
+    ItemVenda:
+      type: object
+      required: [nome, quantidade, preco]
+      properties:
+        nome:
+          type: string
+        quantidade:
+          type: number
+          minimum: 1
+        preco:
+          type: number
+          minimum: 0
   securitySchemes:
     bearerAuth:
       type: http

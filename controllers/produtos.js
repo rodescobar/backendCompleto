@@ -18,13 +18,17 @@ module.exports = {
         }
         catch(e) {
             console.log(e)
-            return e
+            return { erro: "Erro ao criar produto." }
         }
     },
 
     Alterar: async (id, nome, quantidade, preco, descricao, usuario, categoria, imagem) => {
         try {
-            return await Produtos.findByIdAndUpdate(id, { nome, quantidade, preco, descricao, usuario, categoria, imagem }, { new: true})
+            return await Produtos.findOneAndUpdate(
+                { _id: id, usuario },
+                { nome, quantidade, preco, descricao, categoria, imagem },
+                { new: true, runValidators: true }
+            )
         }
         catch (e) {
             console.log(e)
@@ -32,6 +36,6 @@ module.exports = {
     },
 
     Excluir: async (id, usuario) => {
-        return await Produtos.deleteOne({ _id: id, usuario: usuario })
+        return await Produtos.deleteOne({ _id: id, usuario })
     },
 }

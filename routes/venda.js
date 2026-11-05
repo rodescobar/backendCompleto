@@ -8,21 +8,34 @@ route.get("/venda/:id?", async (req, res) => {
     const usuario = req.usuarioId
     const id = req.params.id || req.query.id || ""
 
-    var retorno = await Venda.Listar(usuario, id)
-
-    return res.send(retorno)
+    try {
+        var retorno = await Venda.Listar(usuario, id)
+        return res.send(retorno)
+    } catch (e) {
+        return res.status(400).send({ erro: "Id de venda inválido." })
+    }
 })
 
-route.delete("/venda", async (req, res) => {
-    const { id } = req.body
+const excluirVenda = async (req, res) => {
+    const id = req.params.id || (req.body && req.body.id)
     const usuario = req.usuarioId
 
     if (id == "" || id == undefined)
-        return res.send({ erro: "Id não pode ser nulo." })
+        return res.status(400).send({ erro: "Id não pode ser nulo." })
 
-    var retorno = await Venda.Excluir(id, usuario)
+    try {
+        var retorno = await Venda.Excluir(id, usuario)
+        if (!retorno.deletedCount)
+            return res.status(404).send({ erro: "Venda não encontrada." })
 
-    return res.send(retorno)
-})
+        return res.send(retorno)
+    } catch (e) {
+        return res.status(400).send({ erro: "Id de venda inválido." })
+    }
+}
+
+// Mantém a rota antiga com ID no corpo e também aceita a forma REST com ID na URL.
+route.delete("/venda", excluirVenda)
+route.delete("/venda/:id", excluirVenda)
 
 module.exports = app => app.use("/app", route)

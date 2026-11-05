@@ -8,13 +8,6 @@ const yaml = require("yamljs");
 app.use(cors())
 app.use(express.json())
 
-/*
-const swaggerDocument = yaml.load("./swagger-ui/swagger.yaml");
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-const path = require('path');
-const swaggerDocument = yaml.load(path.join(__dirname, 'swagger-ui', 'swagger.yaml'));
-*/
 const path = require('path');
 const swaggerDocument = yaml.load(path.join(__dirname, 'api', 'swagger-ui', 'swagger.yaml'));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -59,8 +52,8 @@ app.get('/', (req, res) => {
         <body>
             <div class="container">
                 <h1>Bem-vindo ao Backend Completo</h1>
-                <p>Para utilização do backend, acesse o repositório no Swagger:</p>
-                <p><a href="https://rodescobar.github.io/backendCompleto/api/swagger-ui/" target="_blank">https://rodescobar.github.io/backendCompleto/api/swagger-ui/</a></p>
+        <p>Para utilização do backend, consulte a documentação:</p>
+        <p><a href="/api-docs/">Swagger local</a></p>
             </div>
         </body>
         </html>
@@ -81,7 +74,11 @@ require("./routes/venda")(app)
 require("./routes/limpar")(app)
 
 const port = process.env.PORT || 3000;
-app.listen(port, (req, res) => {
-    console.log("servidor on")
-})
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Servidor on na porta ${port}`)
+    })
+}
+
+module.exports = app
 
